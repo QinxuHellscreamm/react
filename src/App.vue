@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { watch, ref } from "vue";
+import { watch, ref,onErrorCaptured } from "vue";
 import HelloWorld from "./components/HelloWorld.vue";
 import getMousePosition from "./hooks/mousePosition";
 import axiosGet from "./hooks/urlLoader";
+import SyncShow from "./components/SyncShow.vue"
+import DogShow from "./components/dogShow.vue";
+const err = ref(null);
+onErrorCaptured((e:any)=>{
+  console.log(e);
+  err.value = e.message
+  return true // 是否向上传递
+})
 const xy = getMousePosition();
+
 interface emitObj {
   age: number;
   name: string;
@@ -15,7 +24,12 @@ const alertNum = (obj: emitObj) => {
 watch(xy, (newXY) => {
   console.log(newXY);
 });
-const dogs: [] = ref([]);
+interface dogType {
+  loading: boolean;
+  error: any;
+  result: { message: string; status: string } | null;
+}
+const dogs = ref<dogType[]>([]);
 console.log(dogs.value);
 const addDog = () => {
   const res = axiosGet("https://dog.ceo/api/breeds/image/random");
@@ -39,6 +53,16 @@ const addDog = () => {
     </a>
   </div>
   <HelloWorld msg="Vite + Vue" @update="alertNum" @change="addDog" />
+  <suspense>
+    <template #default>
+<!--      <SyncShow></SyncShow>-->
+      <dog-show></dog-show>
+    </template>
+    <template #fallback>
+      <h1>laoding</h1>
+    </template>
+  </suspense>
+  <h1>{{err}}</h1>
 </template>
 
 <style scoped>

@@ -1,14 +1,7 @@
 import { reactive } from "vue";
 import axios from "axios";
-
-interface dataType {
-  loaded: boolean;
-  loading: boolean;
-  error: any;
-  result: { message: string; status: string } | null;
-}
 const urlLoader = (url: string) => {
-  const res: dataType = reactive({
+  const res = reactive({
     loaded: false,
     loading: true,
     error: null,
